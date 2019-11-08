@@ -50,7 +50,7 @@ class DataClass(object):
 
 class Dataset():
 
-    def __init__(self, path=None, prefix=None):
+    def __init__(self, path=None, prefix=None, isDebug=False):
         self.DataClass = DataClass
         self.num_classes = None
         self.classes = None
@@ -60,6 +60,7 @@ class Dataset():
         self.idx2cls = None
         self.batch_queue = None
         self.batch_workers = None
+        self.isDebug = isDebug
 
         if path is not None:
             self.init_from_list(path, prefix)
@@ -67,6 +68,8 @@ class Dataset():
     def init_from_list(self, filename, prefix=None):
         with open(filename, 'r') as f:
             lines = f.readlines()
+        if self.isDebug:
+            lines = lines[0:100]
         lines = [line.strip().split(' ') for line in lines]
         assert len(lines)>0, \
             'List file must be in format: "fullpath(str) label(int)"'
@@ -106,6 +109,7 @@ class Dataset():
                 dict_classes[label] = [i]
             else:
                 dict_classes[label].append(i)
+
         for label, indices in dict_classes.items():
             classes.append(self.DataClass(str(label), indices, label))
             self.idx2cls[indices] = classes[-1]
@@ -131,7 +135,7 @@ class Dataset():
         indices_batch = []
         
         # Random photo-caricature pair
-        assert batch_size%2 == 0
+        assert batch_size % 2 == 0
         classes = np.random.permutation(self.classes)[:batch_size//2]
         indices_batch = np.concatenate([c.random_pc_pair() for c in classes], axis=0)
 
@@ -141,6 +145,7 @@ class Dataset():
             batch['labels'] = self.labels[indices_batch]
             if self.is_photo is not None:
                 batch['is_photo'] = self.is_photo[indices_batch]
+
 
         return batch
 

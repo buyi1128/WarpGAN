@@ -225,7 +225,7 @@ def preprocess(images, config, is_training=False):
         image_paths = images
         images = []
         assert (config.channels==1 or config.channels==3)
-        mode = 'RGB' if config.channels==3 else 'I'
+        mode = 'RGB' if config.channels == 3 else 'I'
         for image_path in image_paths:
             images.append(misc.imread(image_path, mode=mode))
         images = np.stack(images, axis=0)

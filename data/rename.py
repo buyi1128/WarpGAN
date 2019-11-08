@@ -1,7 +1,7 @@
 import os
 
 
-prefix = 'data/WebCaricature/OriginalImages'
+prefix = '/data/WebCaricature/OriginalImages'
 
 for oldname in os.listdir(prefix):
     newname = oldname.replace(' ', '_')

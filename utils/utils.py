@@ -33,12 +33,13 @@ from datetime import datetime
 import shutil
 
 def create_log_dir(config, config_file):
-    subdir = datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
+    # subdir = datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S')
+    subdir = "tmp"
     log_dir = os.path.join(os.path.expanduser(config.log_base_dir), config.name, subdir)
     if not os.path.isdir(log_dir):  # Create the log directory if it doesn't exist
         os.makedirs(log_dir)
-    shutil.copyfile(config_file, os.path.join(log_dir,'config.py'))
-    shutil.copyfile(config.network, os.path.join(log_dir,'network.py'))
+    shutil.copyfile(config_file, os.path.join(log_dir, 'config.py'))
+    shutil.copyfile(config.network, os.path.join(log_dir, 'network.py'))
 
     return log_dir
 

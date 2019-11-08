@@ -26,7 +26,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from align.matlab_cp2tform import get_similarity_transform_for_cv2
+from matlab_cp2tform import get_similarity_transform_for_cv2
 
 import numpy as np
 from scipy import misc
@@ -98,7 +98,7 @@ def main(args):
                 os.makedirs(dir_path)
             img_path_new = os.path.join(dir_path, file_name)
             misc.imsave(img_path_new, img_new)
-            if i % 100==0:
+            if i % 100 == 0:
                 print(img_path_new)
 
 

@@ -1,13 +1,19 @@
-import tensorflow as tf
+# import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 from . import detect_face
 
 class Detector(object):
     def __init__(self):
         with tf.Graph().as_default():
+            # GPU
             gpu_options = tf.GPUOptions(allow_growth=True)
             tf_config = tf.ConfigProto(gpu_options=gpu_options,
                     allow_soft_placement=True, log_device_placement=False)
             sess = tf.Session(config=tf_config)
+            # # ## CPU
+            #  sess = tf.Session()
             with sess.as_default():
                 self.pnet, self.rnet, self.onet = detect_face.create_mtcnn(sess, None)
     

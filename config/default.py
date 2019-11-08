@@ -6,6 +6,10 @@ import os
 
 ####### INPUT OUTPUT #######
 
+# debug
+isDebug = True
+
+
 # The name of the current model for output
 name = 'default'
 
@@ -20,7 +24,7 @@ summary_interval = 100
 
 # Prefix to the image files
 # data_prefix = os.environ["DATABASES2"] + "/caricature/WebCaricature/webcaric_5ptaligned_sc0.7_256/"
-data_prefix = "data/webcaricature_aligned_256/"
+data_prefix = "./data/webcaricacture_aligned_256/"
 
 # Training data list
 train_dataset_path = "./data/train.txt"
@@ -88,10 +92,10 @@ learning_rate_schedule = {
 }
 
 # Restore model
-restore_model = "pretrained/discriminator_casia_256/"
+restore_model = ""  # "pretrained/discriminator_casia_256/"
 
 # Keywords to filter restore variables, set None for all
-restore_scopes =  ['Discriminator/conv', 'Discriminator/Bot']
+restore_scopes = ['Discriminator/conv', 'Discriminator/Bot']
 
 # Weight decay for model variables
 weight_decay = 1e-4

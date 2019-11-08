@@ -31,14 +31,21 @@ from functools import partial
 import numpy as np
 import tensorflow as tf
 
+# import tensorflow.compat.v1 as tf
+#
+# tf.disable_v2_behavior()
 
 class WarpGAN:
     def __init__(self):
         self.graph = tf.Graph()
+        # ## GPU
         gpu_options = tf.GPUOptions(allow_growth=True)
         tf_config = tf.ConfigProto(gpu_options=gpu_options,
                 allow_soft_placement=True, log_device_placement=False)
         self.sess = tf.Session(graph=self.graph, config=tf_config)
+
+        # ## CPU
+        # self.sess = tf.Session(graph=self.graph)
             
     def initialize(self, config, num_classes=None):
         '''
@@ -46,11 +53,12 @@ class WarpGAN:
         '''
         with self.graph.as_default():
             with self.sess.as_default():
+
                 # Set up placeholders
                 h, w = config.image_size
                 channels = config.channels
-                self.images_A = tf.placeholder(tf.float32, shape=[None, h, w, channels], name='images_A')
-                self.images_B = tf.placeholder(tf.float32, shape=[None, h, w, channels], name='images_B')
+                self.images_A = tf.placeholder(tf.float32, shape=[None, h, w, channels], name='images_A')  # images_A is caricature
+                self.images_B = tf.placeholder(tf.float32, shape=[None, h, w, channels], name='images_B')  # images_B is photo
                 self.labels_A = tf.placeholder(tf.int32, shape=[None], name='labels_A')
                 self.labels_B = tf.placeholder(tf.int32, shape=[None], name='labels_B')
                 self.scales_A = tf.placeholder(tf.float32, shape=[None], name='scales_A')
@@ -321,6 +329,7 @@ class WarpGAN:
                         self.learning_rate: learning_rate,
                         self.keep_prob: keep_prob,
                         self.phase_train: True,}
+
         _, wl, sm = self.sess.run([self.train_op, self.watch_list, self.summary_op], feed_dict = feed_dict)
 
         step = self.sess.run(self.global_step)

@@ -128,7 +128,7 @@ def encoder(images, style_size=8, keep_prob=1.0, phase_train=True, weight_decay=
             with slim.arg_scope([slim.dropout, slim.batch_norm], is_training=phase_train):
                 with slim.arg_scope([slim.fully_connected],
                     normalizer_fn=layer_norm, normalizer_params=None):
-                    print('{} input shape:'.format(scope), [dim.value for dim in images.shape])
+                    print('\n{} input shape:'.format(scope), [dim.value for dim in images.shape])
 
                     batch_size = tf.shape(images)[0]
                     k = 64
@@ -199,7 +199,7 @@ def decoder(encoded, scales, styles, texture_only=False, style_size=8, image_siz
             with slim.arg_scope([slim.dropout, slim.batch_norm], is_training=phase_train):
                 with slim.arg_scope([slim.fully_connected],
                     normalizer_fn=layer_norm, normalizer_params=None):
-                    print('{} input shape:'.format(scope), [dim.value for dim in encoded.shape])
+                    print('\n{} input shape:'.format(scope), [dim.value for dim in encoded.shape])
                         
                     batch_size = tf.shape(encoded)[0]
                     h, w = tuple(image_size)
@@ -219,6 +219,7 @@ def decoder(encoded, scales, styles, texture_only=False, style_size=8, image_siz
                         print('module fc3 shape:', [dim.value for dim in net.shape])
 
                         gamma = slim.fully_connected(net, 4*k, activation_fn=None, normalizer_fn=None, scope='fc4')
+                        print('module fc4 shape:', [dim.value for dim in gamma.shape])
                         gamma = tf.reshape(gamma, [-1, 1, 1, 4*k], name='gamma')
                         print('gamma shape:', [dim.value for dim in gamma.shape])
 
@@ -261,7 +262,7 @@ def decoder(encoded, scales, styles, texture_only=False, style_size=8, image_siz
 
                     with tf.variable_scope('WarpController'):
 
-                        print('-- WarpController')
+                        print('\n-- WarpController')
 
                         net = encoded
                         warp_input = tf.identity(images_rendered, name='warp_input')
