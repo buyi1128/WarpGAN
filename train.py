@@ -36,23 +36,23 @@ from utils.dataset import Dataset
 from warpgan import WarpGAN
 
 
-def test(network, config, log_dir, step):
+def validate(network, config, log_dir, step):
 
     # Initialize testing
-    if not hasattr(test, 'images'):
-        testset = Dataset(config.test_dataset_path, prefix=config.data_prefix)
+    if not hasattr(validate, 'images'):
+        testset = Dataset(config.test_dataset_path, prefix=config.data_prefix, isDebug=config.isDebug)
         random_indices = np.random.permutation(np.where(testset.is_photo)[0])[:64]
-        test.images = testset.images[random_indices].astype(np.object)
-        test.images = preprocess(test.images, config, is_training=False)
+        validate.images = testset.images[random_indices].astype(np.object)
+        validate.images = preprocess(validate.images, config, is_training=False)
 
     output_dir = os.path.join(log_dir, 'samples')
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)
 
     # scales = np.indices((8,8), dtype=np.float32)[1] * 5
-    scales = np.ones((8,8))
+    scales = np.ones((8, 8))
     scales = scales.flatten()
-    test_results = network.generate_BA(test.images, scales, config.batch_size)
+    test_results = network.generate_BA(validate.images, scales, config.batch_size)
     utils.save_manifold(test_results, os.path.join(output_dir, '{}.jpg'.format(step)))
     
     
@@ -64,7 +64,7 @@ def main(args):
     if args.name:
         config.name = args.name
 
-    trainset = Dataset(config.train_dataset_path, prefix=config.data_prefix)
+    trainset = Dataset(config.train_dataset_path, prefix=config.data_prefix, isDebug=config.isDebug)
 
     network = WarpGAN()
     network.initialize(config, trainset.num_classes)
@@ -73,6 +73,8 @@ def main(args):
     if config.save_model:
         log_dir = utils.create_log_dir(config, config_file)
         summary_writer = tf.summary.FileWriter(log_dir, network.graph)
+
+
     if config.restore_model:
         network.restore_model(config.restore_model, config.restore_scopes)
 
@@ -87,7 +89,7 @@ def main(args):
     start_time = time.time()
     for epoch in range(config.num_epochs):
 
-        if epoch == 0: test(network, config, log_dir, global_step)
+        if epoch == 0: validate(network, config, log_dir, global_step)
 
         # Training
         for step in range(config.epoch_size):
@@ -108,7 +110,7 @@ def main(args):
                     summary_writer.add_summary(sm, global_step=global_step)
 
         # Testing
-        test(network, config, log_dir, global_step)
+        validate(network, config, log_dir, global_step)
 
         # Save the model
         if config.save_model:
@@ -116,10 +118,15 @@ def main(args):
 
 
 if __name__=="__main__":
+
+    # tf.device('/gpu:1')   ## ????
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Just disables the warning, doesn't enable AVX/FMA
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("config_file", help="The path to the training configuration file",
-                        type=str)
+    parser.add_argument("--config_file", help="The path to the training configuration file",
+                        type=str, default="config/default.py")
     parser.add_argument("--name", help="Rename the log dir",
-                        type=str, default=None)
+                        type=str, default="default_mobile_1")
     args = parser.parse_args()
     main(args)
